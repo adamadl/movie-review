@@ -11,34 +11,38 @@
       <button type="submit" class="btn btn-primary">Search</button>
     </form>
     <div id="results"></div>
+  </div>
+</main>
 
-    <!-- Add review modal -->
-  <div class="modal fade" id="review-modal" tabindex="-1" role="dialog" aria-labelledby="review-modal-title" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
+<!-- Add Review Modal -->
+<div class="modal fade" id="review-modal" tabindex="-1" role="dialog" aria-labelledby="review-modal-label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="review-form">
         <div class="modal-header">
-          <h5 class="modal-title" id="review-modal-title">Add Review</h5>
+          <h5 class="modal-title" id="review-modal-label">Add Review</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <form id="add-review-form">
-            <div class="form-group">
-              <label for="review-name">Item Name:</label>
-              <input type="text" class="form-control" id="review-name" name="item" readonly>
-            </div>
-            <div class="form-group">
-              <label for="review-text">Review:</label>
-              <textarea class="form-control" id="review-text" name="review"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-          </form>
+          <div class="form-group">
+            <label for="item-input">Item:</label>
+            <input type="text" class="form-control" id="item-input" readonly>
+          </div>
+          <div class="form-group">
+            <label for="review-input">Review:</label>
+            <textarea class="form-control" id="review-input" rows="3"></textarea>
+          </div>
         </div>
-      </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save Review</button>
+        </div>
+      </form>
     </div>
   </div>
-</main>
+</div>
 
 <%- include('../partials/footer') %>
 
@@ -46,6 +50,9 @@
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.getElementById('search-form');
   const results = document.getElementById('results');
+  const reviewForm = document.getElementById('review-form');
+  const itemInput = document.getElementById('item-input');
+  const reviewInput = document.getElementById('review-input');
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -70,9 +77,38 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
         </div>
       `;
+      itemInput.value = data.title;
     } catch (error) {
       console.error(error);
       results.innerHTML = 'Error fetching search results.';
+    }
+  });
+
+  reviewForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const itemName = itemInput.value;
+    const reviewText = reviewInput.value;
+    if (!reviewText) {
+      alert('Please enter a review.');
+      return;
+    }
+    try {
+      const response = await fetch('/review', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          itemName,
+          reviewText
+        })
+      });
+      const data = await response.json();
+      console.log(data);
+      window.location.href = '/';
+    } catch (error) {
+      console.error(error);
+      alert('Error adding review.');
     }
   });
 });

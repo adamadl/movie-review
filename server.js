@@ -135,6 +135,27 @@ app.get('/search', async (req, res) => {
       res.json({ error: 'An error occurred while fetching the search results' });
     }
   });
+
+  app.post('/review', async (req, res) => {
+    try {
+      const { item, review } = req.body;
+      await db.query('INSERT INTO reviews (item, review) VALUES ($1, $2)', [item, review]);
+      res.redirect('/reviews');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error submitting review.');
+    }
+  });
+
+  app.get('/reviews', async (req, res) => {
+    try {
+      const { rows } = await db.query('SELECT * FROM reviews');
+      res.render('reviews', { reviews: rows });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error fetching reviews.');
+    }
+  });
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
