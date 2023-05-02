@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+<%- include('../partials/menu') %>
+
+<main>
+  <div class="container">
+    <h1>Reviews</h1>
+  <table class="container-fluid">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Review</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+        <% reviews.forEach(review => { %>
+            <tr>
+              <td><%= review.item %></td>
+              <td><%= review.review %></td>
+              <td><%= review.review_date.toDateString() %></td>
+            </tr>
+        <% }) %>
+    </tbody>
+  </table>
+  </div> 
+</main>
+
+<%- include('../partials/footer') %>

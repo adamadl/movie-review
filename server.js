@@ -136,24 +136,36 @@ app.get('/search', async (req, res) => {
     }
   });
 
-  app.post('/review', async (req, res) => {
-    try {
-      const { item, review } = req.body;
-      await db.query('INSERT INTO reviews (item, review) VALUES ($1, $2)', [item, review]);
-      res.redirect('/reviews');
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Error submitting review.');
-    }
-  });
+  // app.post('/review', async (req, res) => {
+  //   try {
+  //     const { item, review } = req.body;
+  //     await db.query('INSERT INTO reviews (item, review) VALUES ($1, $2)', [item, review]);
+  //     res.redirect('/reviews');
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).send('Error submitting review.');
+  //   }
+  // });
 
   app.get('/reviews', async (req, res) => {
     try {
-      const { rows } = await db.query('SELECT * FROM reviews');
-      res.render('reviews', { reviews: rows });
+      const reviews = await db.query('SELECT * FROM reviews ORDER BY review_date DESC');
+      // console.log(reviews);
+      res.render('pages/reviews', { reviews: reviews });
     } catch (error) {
       console.error(error);
-      res.status(500).send('Error fetching reviews.');
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
+  app.post('/reviews', async (req, res) => {
+    try {
+      // Insert the data into the reviews table
+      await db.query('INSERT INTO reviews (item, review) VALUES ($1, $2)', [req.body.item, req.body.review]);
+      res.json({ success: true });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 // *****************************************************

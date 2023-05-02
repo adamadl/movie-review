@@ -10,21 +10,12 @@
       </div>
       <button type="submit" class="btn btn-primary">Search</button>
     </form>
-    <div id="results"></div>
-  </div>
-</main>
-
-<!-- Add Review Modal -->
-<div class="modal fade" id="review-modal" tabindex="-1" role="dialog" aria-labelledby="review-modal-label" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <form id="review-form">
-        <div class="modal-header">
-          <h5 class="modal-title" id="review-modal-label">Add Review</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
+    <div id="results">
+      
+    </div>
+    <div id="review-modal" class="modal">
+      <div class="modal-content">
+        <h4>Add Review</h4>
         <div class="modal-body">
           <div class="form-group">
             <label for="item-input">Item:</label>
@@ -35,81 +26,13 @@
             <textarea class="form-control" id="review-input" rows="3"></textarea>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Save Review</button>
+        <div class="modal-buttons">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" id="close">Close</button>
+          <input type="submit" class="btn btn-default btn-primary" data-dismiss="modal" value="Save Review" id="submit-button"/>
         </div>
-      </form>
+      </div>
     </div>
   </div>
-</div>
+</main>
 
 <%- include('../partials/footer') %>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const form = document.getElementById('search-form');
-  const results = document.getElementById('results');
-  const reviewForm = document.getElementById('review-form');
-  const itemInput = document.getElementById('item-input');
-  const reviewInput = document.getElementById('review-input');
-
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const searchTerm = document.getElementById('search-input').value;
-    if (!searchTerm) {
-      results.innerHTML = 'Please enter a search term.';
-      return;
-    }
-    try {
-      const response = await fetch(`/search?search=${searchTerm}`);
-      const data = await response.json();
-      console.log(data);
-      results.innerHTML = `
-        <div class="card h-100">
-          <img src="https://image.tmdb.org/t/p/original${data.backdrop_path}" class="card-img-top" alt="Movie Poster">
-          <div class="card-body">
-            <h5 class="card-title">${data.title} | ${data.release_date}</h5>
-            <p>${data.overview}</p>
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#review-modal">
-              Add Review
-            </button>
-          </div>
-        </div>
-      `;
-      itemInput.value = data.title;
-    } catch (error) {
-      console.error(error);
-      results.innerHTML = 'Error fetching search results.';
-    }
-  });
-
-  reviewForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const itemName = itemInput.value;
-    const reviewText = reviewInput.value;
-    if (!reviewText) {
-      alert('Please enter a review.');
-      return;
-    }
-    try {
-      const response = await fetch('/review', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          itemName,
-          reviewText
-        })
-      });
-      const data = await response.json();
-      console.log(data);
-      window.location.href = '/';
-    } catch (error) {
-      console.error(error);
-      alert('Error adding review.');
-    }
-  });
-});
-</script>
